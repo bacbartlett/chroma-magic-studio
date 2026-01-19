@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, Check, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,10 @@ interface ExportButtonProps {
   disabled?: boolean;
 }
 
-export function ExportButton({ processedImageData, originalFilename = 'image', disabled = false }: ExportButtonProps) {
+export const ExportButton = forwardRef<HTMLButtonElement, ExportButtonProps>(function ExportButton(
+  { processedImageData, originalFilename = 'image', disabled = false },
+  ref
+) {
   const [isExporting, setIsExporting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -58,6 +61,7 @@ export function ExportButton({ processedImageData, originalFilename = 'image', d
 
   return (
     <Button
+      ref={ref}
       onClick={handleExport}
       disabled={disabled || !processedImageData || isExporting}
       size="lg"
@@ -101,4 +105,4 @@ export function ExportButton({ processedImageData, originalFilename = 'image', d
       </AnimatePresence>
     </Button>
   );
-}
+});

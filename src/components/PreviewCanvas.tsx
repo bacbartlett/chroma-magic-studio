@@ -1,6 +1,6 @@
-import { useRef, useEffect, useCallback, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ZoomIn, ZoomOut, Move } from 'lucide-react';
+import { useRef, useEffect, useCallback, useState, forwardRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ZoomIn, ZoomOut, Move, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface PreviewCanvasProps {
@@ -8,14 +8,16 @@ interface PreviewCanvasProps {
   processedImageData: ImageData | null;
   isEyedropperActive: boolean;
   onColorPick: (x: number, y: number) => void;
+  isProcessing?: boolean;
 }
 
-export function PreviewCanvas({
+export const PreviewCanvas = forwardRef<HTMLDivElement, PreviewCanvasProps>(function PreviewCanvas({
   originalCanvas,
   processedImageData,
   isEyedropperActive,
   onColorPick,
-}: PreviewCanvasProps) {
+  isProcessing = false,
+}, ref) {
   const originalRef = useRef<HTMLCanvasElement>(null);
   const processedRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -153,6 +155,21 @@ export function PreviewCanvas({
                 className="max-w-full h-auto block"
                 style={{ maxHeight: '60vh' }}
               />
+              <AnimatePresence>
+                {isProcessing && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-background/60 backdrop-blur-sm flex items-center justify-center"
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                      <span className="text-sm font-medium text-foreground">Processing...</span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -172,4 +189,4 @@ export function PreviewCanvas({
       )}
     </motion.div>
   );
-}
+});
