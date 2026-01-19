@@ -220,6 +220,7 @@ export function ChromaKeyApp() {
               processedImageData={processedImageData}
               isEyedropperActive={isEyedropperActive}
               onColorPick={handleColorPick}
+              isProcessing={isProcessing}
             />
           </div>
         )}

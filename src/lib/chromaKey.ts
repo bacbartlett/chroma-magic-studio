@@ -63,6 +63,7 @@ function getMatchStrength(
 }
 
 // Flood fill from edges to find outer contiguous regions
+// Uses BFS starting from all edge pixels, only following matching color pixels
 function findOuterContiguousPixels(
   imageData: ImageData,
   target: { r: number; g: number; b: number },
@@ -71,52 +72,65 @@ function findOuterContiguousPixels(
   const { width, height, data } = imageData;
   const visited = new Set<number>();
   const toRemove = new Set<number>();
+  
+  // Use array as queue for BFS - more efficient than shift()
   const queue: number[] = [];
+  let queueStart = 0;
 
-  // Start from all edge pixels that match the target color
-  for (let x = 0; x < width; x++) {
-    // Top edge
-    queue.push(x);
-    // Bottom edge
-    queue.push((height - 1) * width + x);
-  }
-  for (let y = 0; y < height; y++) {
-    // Left edge
-    queue.push(y * width);
-    // Right edge
-    queue.push(y * width + (width - 1));
-  }
-
-  while (queue.length > 0) {
-    const pixelIndex = queue.shift()!;
+  // Helper to add pixel to queue if it matches and hasn't been visited
+  const enqueueIfMatch = (pixelIndex: number) => {
+    if (visited.has(pixelIndex)) return;
     
-    if (visited.has(pixelIndex)) continue;
-    visited.add(pixelIndex);
-
     const dataIndex = pixelIndex * 4;
     const r = data[dataIndex];
     const g = data[dataIndex + 1];
     const b = data[dataIndex + 2];
+    
+    if (isColorMatch(r, g, b, target, tolerance)) {
+      visited.add(pixelIndex);
+      toRemove.add(pixelIndex);
+      queue.push(pixelIndex);
+    } else {
+      // Mark as visited so we don't check again, but don't add to toRemove
+      visited.add(pixelIndex);
+    }
+  };
 
-    if (!isColorMatch(r, g, b, target, tolerance)) continue;
+  // Start from all edge pixels
+  // Top and bottom edges
+  for (let x = 0; x < width; x++) {
+    enqueueIfMatch(x); // Top edge
+    enqueueIfMatch((height - 1) * width + x); // Bottom edge
+  }
+  // Left and right edges (skip corners already added)
+  for (let y = 1; y < height - 1; y++) {
+    enqueueIfMatch(y * width); // Left edge
+    enqueueIfMatch(y * width + (width - 1)); // Right edge
+  }
 
-    toRemove.add(pixelIndex);
-
+  // BFS to find all connected matching pixels
+  while (queueStart < queue.length) {
+    const pixelIndex = queue[queueStart++];
+    
     const x = pixelIndex % width;
     const y = Math.floor(pixelIndex / width);
 
     // Check 4-connected neighbors
-    const neighbors = [
-      x > 0 ? pixelIndex - 1 : -1,           // left
-      x < width - 1 ? pixelIndex + 1 : -1,   // right
-      y > 0 ? pixelIndex - width : -1,        // up
-      y < height - 1 ? pixelIndex + width : -1 // down
-    ];
-
-    for (const neighbor of neighbors) {
-      if (neighbor >= 0 && !visited.has(neighbor)) {
-        queue.push(neighbor);
-      }
+    if (x > 0) {
+      const left = pixelIndex - 1;
+      if (!visited.has(left)) enqueueIfMatch(left);
+    }
+    if (x < width - 1) {
+      const right = pixelIndex + 1;
+      if (!visited.has(right)) enqueueIfMatch(right);
+    }
+    if (y > 0) {
+      const up = pixelIndex - width;
+      if (!visited.has(up)) enqueueIfMatch(up);
+    }
+    if (y < height - 1) {
+      const down = pixelIndex + width;
+      if (!visited.has(down)) enqueueIfMatch(down);
     }
   }
 
