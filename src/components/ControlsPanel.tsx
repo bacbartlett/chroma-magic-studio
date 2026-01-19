@@ -3,8 +3,10 @@ import { Sliders, Blend, Palette, Target } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
 import { hexToRgb, rgbToHex } from '@/lib/chromaKey';
 import type { ChromaKeySettings } from '@/lib/chromaKey';
+import { useState, useEffect } from 'react';
 
 interface ControlsPanelProps {
   settings: ChromaKeySettings;
@@ -14,6 +16,84 @@ interface ControlsPanelProps {
 
 export function ControlsPanel({ settings, onSettingsChange, disabled = false }: ControlsPanelProps) {
   const { tolerance, edgeSmoothing, fillMode, replacementColor, selectionMode } = settings;
+  const [toleranceInput, setToleranceInput] = useState<string>(tolerance.toString());
+  const [edgeSmoothingInput, setEdgeSmoothingInput] = useState<string>(edgeSmoothing.toString());
+
+  // Update input when tolerance changes from slider
+  const handleToleranceSliderChange = (value: number) => {
+    setToleranceInput(value.toString());
+    onSettingsChange({ tolerance: value });
+  };
+
+  // Handle input change
+  const handleToleranceInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setToleranceInput(value);
+    
+    // Update immediately if valid number
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue) && numValue >= 0 && numValue <= 100) {
+      onSettingsChange({ tolerance: Math.round(numValue) });
+    }
+  };
+
+  // Handle input blur - clamp to valid range
+  const handleToleranceInputBlur = () => {
+    const numValue = parseFloat(toleranceInput);
+    if (isNaN(numValue) || numValue < 0) {
+      setToleranceInput('0');
+      onSettingsChange({ tolerance: 0 });
+    } else if (numValue > 100) {
+      setToleranceInput('100');
+      onSettingsChange({ tolerance: 100 });
+    } else {
+      setToleranceInput(Math.round(numValue).toString());
+      onSettingsChange({ tolerance: Math.round(numValue) });
+    }
+  };
+
+  // Sync input when tolerance changes externally
+  useEffect(() => {
+    setToleranceInput(tolerance.toString());
+  }, [tolerance]);
+
+  // Update input when edge smoothing changes from slider
+  const handleEdgeSmoothingSliderChange = (value: number) => {
+    setEdgeSmoothingInput(value.toString());
+    onSettingsChange({ edgeSmoothing: value });
+  };
+
+  // Handle edge smoothing input change
+  const handleEdgeSmoothingInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEdgeSmoothingInput(value);
+    
+    // Update immediately if valid number
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue) && numValue >= 0 && numValue <= 20) {
+      onSettingsChange({ edgeSmoothing: Math.round(numValue) });
+    }
+  };
+
+  // Handle edge smoothing input blur - clamp to valid range
+  const handleEdgeSmoothingInputBlur = () => {
+    const numValue = parseFloat(edgeSmoothingInput);
+    if (isNaN(numValue) || numValue < 0) {
+      setEdgeSmoothingInput('0');
+      onSettingsChange({ edgeSmoothing: 0 });
+    } else if (numValue > 20) {
+      setEdgeSmoothingInput('20');
+      onSettingsChange({ edgeSmoothing: 20 });
+    } else {
+      setEdgeSmoothingInput(Math.round(numValue).toString());
+      onSettingsChange({ edgeSmoothing: Math.round(numValue) });
+    }
+  };
+
+  // Sync input when edge smoothing changes externally
+  useEffect(() => {
+    setEdgeSmoothingInput(edgeSmoothing.toString());
+  }, [edgeSmoothing]);
 
   return (
     <motion.div
@@ -29,11 +109,29 @@ export function ControlsPanel({ settings, onSettingsChange, disabled = false }: 
             <Sliders className="w-4 h-4 text-muted-foreground" />
             Tolerance
           </Label>
-          <span className="text-sm font-mono text-muted-foreground">{tolerance}%</span>
+          <div className="flex items-center gap-2">
+            <Input
+              type="number"
+              value={toleranceInput}
+              onChange={handleToleranceInputChange}
+              onBlur={handleToleranceInputBlur}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.currentTarget.blur();
+                }
+              }}
+              min={0}
+              max={100}
+              step={1}
+              disabled={disabled}
+              className="w-20 h-8 text-sm font-mono text-center"
+            />
+            <span className="text-sm font-mono text-muted-foreground">%</span>
+          </div>
         </div>
         <Slider
           value={[tolerance]}
-          onValueChange={([value]) => onSettingsChange({ tolerance: value })}
+          onValueChange={([value]) => handleToleranceSliderChange(value)}
           min={0}
           max={100}
           step={1}
@@ -52,11 +150,29 @@ export function ControlsPanel({ settings, onSettingsChange, disabled = false }: 
             <Blend className="w-4 h-4 text-muted-foreground" />
             Edge Smoothing
           </Label>
-          <span className="text-sm font-mono text-muted-foreground">{edgeSmoothing}px</span>
+          <div className="flex items-center gap-2">
+            <Input
+              type="number"
+              value={edgeSmoothingInput}
+              onChange={handleEdgeSmoothingInputChange}
+              onBlur={handleEdgeSmoothingInputBlur}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.currentTarget.blur();
+                }
+              }}
+              min={0}
+              max={20}
+              step={1}
+              disabled={disabled || fillMode === 'replacement'}
+              className="w-20 h-8 text-sm font-mono text-center"
+            />
+            <span className="text-sm font-mono text-muted-foreground">px</span>
+          </div>
         </div>
         <Slider
           value={[edgeSmoothing]}
-          onValueChange={([value]) => onSettingsChange({ edgeSmoothing: value })}
+          onValueChange={([value]) => handleEdgeSmoothingSliderChange(value)}
           min={0}
           max={20}
           step={1}

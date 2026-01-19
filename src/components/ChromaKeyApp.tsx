@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 
 const DEFAULT_SETTINGS: ChromaKeySettings = {
   targetColor: { r: 0, g: 255, b: 0 },
-  tolerance: 30,
+  tolerance: 10,
   edgeSmoothing: 2,
   fillMode: 'transparent',
   replacementColor: { r: 255, g: 255, b: 255 },
