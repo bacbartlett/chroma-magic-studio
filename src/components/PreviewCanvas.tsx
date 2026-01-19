@@ -148,7 +148,7 @@ export const PreviewCanvas = forwardRef<HTMLDivElement, PreviewCanvasProps>(func
 
           {/* Processed Image */}
           <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Processed</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Preview</p>
             <div className="relative rounded-lg overflow-hidden shadow-soft-lg border border-border checkerboard">
               <canvas
                 ref={processedRef}
