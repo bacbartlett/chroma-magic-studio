@@ -277,3 +277,86 @@ export function getColorAtPosition(
 export function isValidHex(hex: string): boolean {
   return /^#?([a-f\d]{6})$/i.test(hex);
 }
+
+/**
+ * Extract the most common colors from an image canvas
+ * Uses sampling and color quantization for performance
+ * @param canvas - The source canvas to extract colors from
+ * @param maxColors - Maximum number of colors to return (default: 5)
+ * @param sampleStep - Step size for sampling pixels (default: 10, higher = faster but less accurate)
+ * @returns Array of the most common colors sorted by frequency
+ */
+export function extractMostCommonColors(
+  canvas: HTMLCanvasElement,
+  maxColors: number = 5,
+  sampleStep: number = 10
+): { r: number; g: number; b: number }[] {
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  if (!ctx) return [];
+
+  const { width, height } = canvas;
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+
+  // Color quantization: group similar colors together
+  // Use a coarser quantization to group similar colors
+  const quantizeStep = 16; // Quantize to 16 levels per channel (reduces 16M colors to ~4K)
+  
+  // Map to store color frequencies (using quantized color as key)
+  const colorMap = new Map<string, { r: number; g: number; b: number; count: number; totalR: number; totalG: number; totalB: number }>();
+
+  // Sample pixels (don't check every pixel for performance)
+  for (let y = 0; y < height; y += sampleStep) {
+    for (let x = 0; x < width; x += sampleStep) {
+      const index = (y * width + x) * 4;
+      const r = data[index];
+      const g = data[index + 1];
+      const b = data[index + 2];
+      const a = data[index + 3];
+
+      // Skip fully transparent pixels
+      if (a < 128) continue;
+
+      // Quantize color to group similar colors
+      const qR = Math.floor(r / quantizeStep) * quantizeStep;
+      const qG = Math.floor(g / quantizeStep) * quantizeStep;
+      const qB = Math.floor(b / quantizeStep) * quantizeStep;
+      const key = `${qR},${qG},${qB}`;
+
+      if (colorMap.has(key)) {
+        const entry = colorMap.get(key)!;
+        entry.count++;
+        entry.totalR += r;
+        entry.totalG += g;
+        entry.totalB += b;
+      } else {
+        colorMap.set(key, {
+          r: qR,
+          g: qG,
+          b: qB,
+          count: 1,
+          totalR: r,
+          totalG: g,
+          totalB: b,
+        });
+      }
+    }
+  }
+
+  // Convert map to array and calculate average colors
+  const colors = Array.from(colorMap.values())
+    .map(entry => ({
+      r: Math.round(entry.totalR / entry.count),
+      g: Math.round(entry.totalG / entry.count),
+      b: Math.round(entry.totalB / entry.count),
+      count: entry.count,
+    }))
+    // Sort by frequency (most common first)
+    .sort((a, b) => b.count - a.count)
+    // Take top N colors
+    .slice(0, maxColors)
+    // Return just the color (remove count)
+    .map(({ r, g, b }) => ({ r, g, b }));
+
+  return colors;
+}

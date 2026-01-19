@@ -1,10 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-/* ChromaKey Pro Design System - Clean, Premium, Technical */
+/* ChromaKey Free Design System - Clean, Premium, Technical */
 
 @layer base {
   :root {
@@ -17,7 +17,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 25% 10%;
 
-    --primary: 175 70% 40%;
+    --primary: 200 85% 50%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 15% 95%;
@@ -26,8 +26,8 @@
     --muted: 210 15% 92%;
     --muted-foreground: 220 10% 45%;
 
-    --accent: 175 65% 95%;
-    --accent-foreground: 175 70% 30%;
+    --accent: 200 70% 95%;
+    --accent-foreground: 200 85% 35%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
@@ -37,7 +37,7 @@
 
     --border: 210 20% 90%;
     --input: 210 20% 90%;
-    --ring: 175 70% 40%;
+    --ring: 200 85% 50%;
 
     --radius: 0.75rem;
 
@@ -127,5 +127,33 @@
     background-size: 16px 16px;
     background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
     background-color: var(--checkerboard-light);
+  }
+
+  .gradient-background {
+    background: linear-gradient(
+      90deg,
+      hsl(15 85% 88%) 0%,
+      hsl(25 75% 90%) 10%,
+      hsl(35 60% 92%) 20%,
+      hsl(45 50% 94%) 30%,
+      hsl(55 40% 96%) 40%,
+      hsl(65 35% 97%) 50%,
+      hsl(170 40% 96%) 60%,
+      hsl(180 50% 94%) 70%,
+      hsl(190 60% 92%) 80%,
+      hsl(200 70% 90%) 90%,
+      hsl(210 80% 88%) 100%
+    );
+    background-size: 200% 100%;
+    animation: gradient-shift 15s ease infinite;
+  }
+
+  @keyframes gradient-shift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
   }
 }

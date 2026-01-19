@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Pipette, Hash, Palette, Check, AlertCircle } from 'lucide-react';
-import { rgbToHex, hexToRgb, isValidHex } from '@/lib/chromaKey';
+import { rgbToHex, hexToRgb, isValidHex, extractMostCommonColors } from '@/lib/chromaKey';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,7 @@ interface ColorSelectorProps {
   isEyedropperActive: boolean;
   onEyedropperToggle: () => void;
   disabled?: boolean;
+  sourceCanvas?: HTMLCanvasElement | null;
 }
 
 export function ColorSelector({
@@ -20,10 +21,43 @@ export function ColorSelector({
   isEyedropperActive,
   onEyedropperToggle,
   disabled = false,
+  sourceCanvas,
 }: ColorSelectorProps) {
   const hexValue = rgbToHex(selectedColor.r, selectedColor.g, selectedColor.b);
   const [hexInput, setHexInput] = useState(hexValue);
   const [hexError, setHexError] = useState(false);
+
+  // Extract most common colors from the image
+  const quickColors = useMemo(() => {
+    if (!sourceCanvas) {
+      // Fallback to default colors when no image is loaded
+      return [
+        { color: { r: 0, g: 255, b: 0 }, name: 'Green' },
+        { color: { r: 0, g: 177, b: 64 }, name: 'Chroma Green' },
+        { color: { r: 0, g: 71, b: 187 }, name: 'Blue' },
+        { color: { r: 255, g: 255, b: 255 }, name: 'White' },
+        { color: { r: 0, g: 0, b: 0 }, name: 'Black' },
+      ];
+    }
+
+    try {
+      const colors = extractMostCommonColors(sourceCanvas, 5, 10);
+      return colors.map((color, index) => ({
+        color,
+        name: `Color ${index + 1}`,
+      }));
+    } catch (error) {
+      console.error('Error extracting colors:', error);
+      // Fallback to default colors on error
+      return [
+        { color: { r: 0, g: 255, b: 0 }, name: 'Green' },
+        { color: { r: 0, g: 177, b: 64 }, name: 'Chroma Green' },
+        { color: { r: 0, g: 71, b: 187 }, name: 'Blue' },
+        { color: { r: 255, g: 255, b: 255 }, name: 'White' },
+        { color: { r: 0, g: 0, b: 0 }, name: 'Black' },
+      ];
+    }
+  }, [sourceCanvas]);
 
   useEffect(() => {
     setHexInput(hexValue);
@@ -150,22 +184,18 @@ export function ColorSelector({
 
       {/* Common Chroma Key Colors */}
       <div className="pt-2">
-        <p className="text-xs text-muted-foreground mb-2">Quick Colors</p>
-        <div className="flex gap-2">
-          {[
-            { color: { r: 0, g: 255, b: 0 }, name: 'Green' },
-            { color: { r: 0, g: 177, b: 64 }, name: 'Chroma Green' },
-            { color: { r: 0, g: 71, b: 187 }, name: 'Blue' },
-            { color: { r: 255, g: 255, b: 255 }, name: 'White' },
-            { color: { r: 0, g: 0, b: 0 }, name: 'Black' },
-          ].map(({ color, name }) => {
+        <p className="text-xs text-muted-foreground mb-2">
+          {sourceCanvas ? 'Quick Colors (from image)' : 'Quick Colors'}
+        </p>
+        <div className="flex gap-2 flex-wrap">
+          {quickColors.map(({ color, name }, index) => {
             const hex = rgbToHex(color.r, color.g, color.b);
             const isSelected = selectedColor.r === color.r && 
                               selectedColor.g === color.g && 
                               selectedColor.b === color.b;
             return (
               <button
-                key={name}
+                key={`${hex}-${index}`}
                 onClick={() => !disabled && onColorChange(color)}
                 disabled={disabled}
                 title={name}

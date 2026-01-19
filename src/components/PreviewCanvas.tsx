@@ -71,7 +71,7 @@ export const PreviewCanvas = forwardRef<HTMLDivElement, PreviewCanvasProps>(func
 
   if (!originalCanvas) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-muted/30 rounded-xl border-2 border-dashed border-border">
+      <div className="flex-1 flex items-center justify-center bg-white rounded-xl border-2 border-dashed border-border/50 shadow-soft-sm">
         <div className="text-center p-8">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary flex items-center justify-center">
             <Move className="w-8 h-8 text-muted-foreground" />
@@ -117,7 +117,7 @@ export const PreviewCanvas = forwardRef<HTMLDivElement, PreviewCanvasProps>(func
       {/* Preview Container */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-auto bg-muted/30 rounded-xl border border-border"
+        className="flex-1 overflow-auto bg-white rounded-xl border border-border/50 shadow-soft-lg"
       >
         <div
           className="flex gap-4 p-4 min-w-max"
@@ -126,7 +126,7 @@ export const PreviewCanvas = forwardRef<HTMLDivElement, PreviewCanvasProps>(func
           {/* Original Image */}
           <div className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Original</p>
-            <div className="relative rounded-lg overflow-hidden shadow-soft-lg border border-border bg-card">
+            <div className="relative rounded-lg overflow-hidden shadow-soft-lg border border-border/50 bg-white">
               <canvas
                 ref={originalRef}
                 onClick={handleCanvasClick}

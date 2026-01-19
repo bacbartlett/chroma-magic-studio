@@ -97,8 +97,8 @@ export function ImageUploader({ onImageLoad }: ImageUploaderProps) {
           cursor-pointer
           transition-all duration-300 ease-out
           ${isDragging 
-            ? 'border-primary bg-accent scale-[1.02]' 
-            : 'border-border bg-card hover:border-primary/50 hover:bg-accent/50'
+            ? 'border-primary bg-accent/80 backdrop-blur-sm scale-[1.02] shadow-soft-lg' 
+            : 'border-border/70 bg-card/90 backdrop-blur-sm hover:border-primary/50 hover:bg-accent/40 shadow-soft-md'
           }
         `}
       >
