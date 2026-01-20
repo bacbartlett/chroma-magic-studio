@@ -43,7 +43,9 @@ export const ExportButton = forwardRef<HTMLButtonElement, ExportButtonProps>(fun
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${originalFilename.replace(/\.[^/.]+$/, '')}_chromakey.png`;
+      // Remove extension and add -chromakey.png suffix
+      const baseName = originalFilename.replace(/\.[^/.]+$/, '');
+      link.download = `${baseName}-chromakey.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

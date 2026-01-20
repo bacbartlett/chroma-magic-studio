@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, Image as ImageIcon, AlertCircle } from 'lucide-react';
 
 interface ImageUploaderProps {
-  onImageLoad: (image: HTMLImageElement) => void;
+  onImageLoad: (image: HTMLImageElement, filename: string) => void;
 }
 
 const MAX_DIMENSION = 4096;
@@ -39,7 +39,9 @@ export function ImageUploader({ onImageLoad }: ImageUploaderProps) {
           setIsLoading(false);
           return;
         }
-        onImageLoad(img);
+        // Extract filename from file, defaulting to 'image' if not available
+        const filename = file.name || 'image';
+        onImageLoad(img, filename);
         setIsLoading(false);
       };
       img.onerror = () => {

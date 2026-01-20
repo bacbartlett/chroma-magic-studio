@@ -28,7 +28,7 @@ export function ChromaKeyApp() {
   
   const processingTimeoutRef = useRef<number | null>(null);
 
-  const handleImageLoad = useCallback((image: HTMLImageElement) => {
+  const handleImageLoad = useCallback((image: HTMLImageElement, filename: string) => {
     const canvas = document.createElement('canvas');
     canvas.width = image.width;
     canvas.height = image.height;
@@ -40,12 +40,8 @@ export function ChromaKeyApp() {
     setSourceCanvas(canvas);
     setIsEyedropperActive(false);
 
-    // Extract filename from data URL or set default
-    const src = image.src;
-    if (src.includes('name=')) {
-      const match = src.match(/name=([^;]+)/);
-      if (match) setFilename(decodeURIComponent(match[1]));
-    }
+    // Store the original filename
+    setFilename(filename || 'image');
   }, []);
 
   const handleColorPick = useCallback((x: number, y: number) => {
