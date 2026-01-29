@@ -1,73 +1,61 @@
-# Welcome to your Lovable project
+# Chroma Magic Studio
 
-## Project info
+A free browser-based chroma key (green screen) tool. Upload an image, pick the color to remove, tweak tolerance and edge smoothing, and export with a transparent or solid background.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+**Live app:** [chromakeyfree.com](https://chromakeyfree.com)
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **Image upload** — Drag and drop or click to load images
+- **Color selection** — Eyedropper or manual RGB picker for the color to remove
+- **Adjustable settings** — Tolerance and edge smoothing for cleaner edges
+- **Fill modes** — Transparent background or a custom replacement color
+- **Export** — Download the result as PNG (with transparency) or JPEG
 
-**Use Lovable**
+## Tech stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- **Vite** — Build and dev server
+- **React 18** — UI
+- **TypeScript** — Typing
+- **Tailwind CSS** — Styling
+- **shadcn/ui** — UI components (Radix + Tailwind)
+- **Vitest** — Tests
 
-Changes made via Lovable will be committed automatically to this repo.
+## Local development
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Requires **Node.js** and **npm** (or [Bun](https://bun.sh) — `bun.lockb` is present).
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repo
 git clone <YOUR_GIT_URL>
+cd chroma-magic-studio
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start dev server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Then open the URL shown in the terminal (usually `http://localhost:5173`).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Scripts
 
-**Use GitHub Codespaces**
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Vite dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Preview production build locally |
+| `npm run lint` | Run ESLint |
+| `npm run test` | Run Vitest once |
+| `npm run test:watch` | Run Vitest in watch mode |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Project structure
 
-## What technologies are used for this project?
+- `src/components/` — Main UI: `ChromaKeyApp`, `ImageUploader`, `ColorSelector`, `ControlsPanel`, `PreviewCanvas`, `ExportButton`
+- `src/lib/chromaKey.ts` — Chroma key processing logic
+- `src/pages/` — Route pages (Index, NotFound)
 
-This project is built with:
+## License
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Private — see repository settings.
